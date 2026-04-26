@@ -39,6 +39,7 @@ term = factor { ("*" | "/") factor } ;
 
 factor = number
        | string
+       | function_call
        | identifier
        | list
        | "(" expression ")"
