@@ -1,72 +1,70 @@
-program         = { statement } ;
+program = { statement } ;
 
-statement       = variable_decl
-                | assignment
-                | print_stmt
-                | input_stmt
-                | if_stmt
-                | loop_stmt
-                | function_def
-                ;
+statement = variable_decl
+            | assignment
+            | print_stmt
+            | input_stmt
+            | if_stmt
+            | loop_stmt
+            | function_def ;
 
-variable_decl   = "let" identifier "=" expression "." ;
+variable_decl = "let" identifier "=" expression "." ;
 
-assignment      = "set" identifier "to" expression "." ;
+assignment = "set" identifier "to" expression "." ;
 
-print_stmt      = "print" expression "." ;
+print_stmt = "print" expression "." ;
 
-input_stmt      = "input" identifier "with" string "." ;
+input_stmt = "input" identifier "with" string "." ;
 
-if_stmt         = "when" condition "then"
-                    { statement }
-                  [ "else"
-                    { statement } ]
-                  "stop" "." ;
+if_stmt = "when" condition "then"
+          { statement }
+            [ "else"
+          { statement } ]
+            "stop" "." ;
 
-loop_stmt       = "keep" "going" ":"
-                    { statement }
-                  "until" condition "." ;
+loop_stmt = "keep" "going" ":"
+               { statement }
+            "until" condition "." ;
 
-function_def    = "define" "task" identifier
-                    { statement }
-                  "end" "task" "." ;
+function_def = "define" "task" identifier
+                  { statement }
+               "end" "task" "." ;
 
-expression      = term { ("+" | "-") term } ;
+expression = term { ("+" | "-") term } ;
 
-term            = factor { ("*" | "/") factor } ;
+term = factor { ("*" | "/") factor } ;
 
-factor          = number
-                | string
-                | identifier
-                | list
-                | "(" expression ")"
-                | modulo_expr
-                ;
+factor = number
+       | string
+       | identifier
+       | list
+       | "(" expression ")"
+       | modulo_expr ;
 
-modulo_expr     = "remainder" "of" expression "/" expression ;
+modulo_expr = "remainder" "of" expression "/" expression ;
 
-list            = "[" [ expression { "," expression } ] "]" ;
+list = "[" [ expression { "," expression } ] "]" ;
 
-condition       = expression comparator expression ;
+condition = expression comparator expression ;
 
-comparator      = ">" | "<" | "==" | ">=" | "<=" ;
+comparator = ">" | "<" | "==" | ">=" | "<=" ;
 
-identifier      = letter { letter | digit } ;
+identifier = letter { letter | digit } ;
 
-number          = digit { digit } ;
+number = digit { digit } ;
 
-string          = '"' { character } '"' ;
+string = '"' { character } '"' ;
 
-letter          = "a" | "b" | "c" | "d" | "e" | "f" | "g"
-                | "h" | "i" | "j" | "k" | "l" | "m" | "n"
-                | "o" | "p" | "q" | "r" | "s" | "t" | "u"
-                | "v" | "w" | "x" | "y" | "z"
-                | "A" | "B" | "C" | "D" | "E" | "F" | "G"
-                | "H" | "I" | "J" | "K" | "L" | "M" | "N"
-                | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
-                | "V" | "W" | "X" | "Y" | "Z" ;
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g"
+       | "h" | "i" | "j" | "k" | "l" | "m" | "n"
+       | "o" | "p" | "q" | "r" | "s" | "t" | "u"
+       | "v" | "w" | "x" | "y" | "z"
+       | "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" ;
 
-digit           = "0" | "1" | "2" | "3" | "4"
-                | "5" | "6" | "7" | "8" | "9" ;
+digit = "0" | "1" | "2" | "3" | "4"
+      | "5" | "6" | "7" | "8" | "9" ;
 
-character       = ? any character except " ? ;
+character = ? any character except " ? ;
