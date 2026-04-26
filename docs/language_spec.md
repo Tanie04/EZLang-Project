@@ -37,7 +37,7 @@ stop.
 ```
 keep going:
     print x.
-until x = 5.
+until x == 5.
 ```
   - Repeats the block until the condition is true
 
