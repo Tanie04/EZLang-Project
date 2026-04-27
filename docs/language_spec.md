@@ -48,8 +48,10 @@ x mod y.
   - Returns the remainder of a division
 
 ## Notes
-  - Every statement ends with a period `.`
-  - `.` is used only to terminate statements (not inside expressions)
-  - `+` is used for both numeric addition and string concatenation
-  - Conditions support the operators: `and`, `or`, `not` 
-  - The language is designed to be simple and easy to read
+- Every statement ends with a period `.`
+- `.` is used only to terminate statements (not inside expressions)
+- `+` is used for both numeric addition and string concatenation
+- Conditions support the operators: `and`, `or`, `not`
+- Negative numbers are supported using `-`
+- Parentheses `()` can be used to group expressions
+- The language is designed to be simple and easy to read
