@@ -1,13 +1,11 @@
-program = { statement } ;
+program = { statement } EOF ;
 
 statement = variable_decl
           | assignment
           | print_stmt
           | input_stmt
           | if_stmt
-          | loop_stmt
-          | function_def
-          | function_call ;
+          | loop_stmt ;
 
 variable_decl = "let" identifier "=" expression "." ;
 
@@ -18,43 +16,60 @@ print_stmt = "print" expression "." ;
 input_stmt = "input" identifier "with" string "." ;
 
 if_stmt = "when" condition "then"
-            { statement }
+            block
           [ "else"
-            { statement } ]
+            block ]
           "stop" "." ;
 
 loop_stmt = "keep" "going" ":"
-              { statement }
+              block
             "until" condition "." ;
 
-function_def = "define" "task" identifier
-                 { statement }
-               "end" "task" "." ;
+block = { statement } ;
 
-function_call = identifier "." ;
+condition = or_expr ;
 
-expression = term { ("+" | "-") term } ;
+or_expr = and_expr { "or" and_expr } ;
 
-term = factor { ("*" | "/") factor } ;
+and_expr = not_expr { "and" not_expr } ;
 
-factor = number
-       | string
-       | function_call
-       | identifier
-       | list
-       | "(" expression ")"
-       | modulo_expr ;
+not_expr = [ "not" ] comparison ;
 
-modulo_expr = "remainder" "of" factor "/" factor ;
-
-list = "[" [ expression { "," expression } ] "]" ;
-
-condition = expression comparator expression ;
+comparison = expression comparator expression ;
 
 comparator = ">" | "<" | "==" | ">=" | "<=" ;
 
-identifier = ? variable name ? ;
+expression = add_expr ;
 
-number = ? number value ? ;
+add_expr = mul_expr { ("+" | "-") mul_expr } ;
 
-string = ? text inside quotes ? ;
+mul_expr = unary_expr { ("*" | "/" | "mod") unary_expr } ;
+
+unary_expr = [ "-" ] primary ;
+
+primary = number
+        | string
+        | identifier
+        | "(" expression ")" ;
+
+identifier = letter { letter | digit | "_" } ;
+
+number = digit { digit } ;
+
+string = '"' { character } '"' ;
+
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g"
+       | "h" | "i" | "j" | "k" | "l" | "m" | "n"
+       | "o" | "p" | "q" | "r" | "s" | "t" | "u"
+       | "v" | "w" | "x" | "y" | "z"
+       | "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" ;
+
+digit = "0" | "1" | "2" | "3" | "4"
+      | "5" | "6" | "7" | "8" | "9" ;
+
+character = ? any character except " ? ;
+
+EOF = ? end of input ? ;
