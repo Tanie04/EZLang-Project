@@ -43,7 +43,7 @@ until x == 5.
 
 ## Modulo
 ```
-x mod y 
+x mod y. 
 ```
   - Returns the remainder of a division
 
