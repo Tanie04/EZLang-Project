@@ -43,7 +43,7 @@ until x == 5.
 
 ## Modulo
 ```
-remainder of x / y
+x mod y 
 ```
   - Returns the remainder of a division
 
@@ -64,5 +64,6 @@ end task.
   - end task. ends the function
 
 ## Notes
-Every statement ends with a period .
+  - "." is used only to terminate statements, not inside expressions.
+  - "+" is used for both numeric addition and string concatenation.
   - The language is designed to be simple and easy to read
