@@ -47,23 +47,9 @@ x mod y
 ```
   - Returns the remainder of a division
 
-## Lists
-```
-set numbers to [1, 2, 3].
-```
-  - Lists use square brackets [ ]
-  - Elements are separated by commas
-
-## Functions
-```
-define task greet
-    print "Hello".
-end task.
-```
-  - define task is used to create a function
-  - end task. ends the function
-
 ## Notes
-  - "." is used only to terminate statements, not inside expressions.
-  - "+" is used for both numeric addition and string concatenation.
+  -Every statement ends with a period .
+  - . is used only to terminate statements (not inside expressions)
+  - + is used for both numeric addition and string concatenation
+  - Conditions support and, or, and not operators
   - The language is designed to be simple and easy to read
