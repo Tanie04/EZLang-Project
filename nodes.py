@@ -1,6 +1,4 @@
-#Structure of types of nodes in the AST 
 class ASTNode:
-    """Base class for all nodes in the AST"""
     pass
 
 class NumberNode(ASTNode):
@@ -22,7 +20,6 @@ class VariableNode(ASTNode):
         return f"{self.name}"
 
 class BinOpNode(ASTNode):
-    """Handles operations like +, -, *, /, and comparisons like >=, =="""
     def __init__(self, left, op, right):
         self.left = left
         self.op = op
@@ -30,33 +27,39 @@ class BinOpNode(ASTNode):
     def __repr__(self):
         return f"({self.left} {self.op} {self.right})"
 
+class UnaryOpNode(ASTNode):
+    def __init__(self, op, operand):
+        self.op = op
+        self.operand = operand
+    def __repr__(self):
+        return f"({self.op}{self.operand})"
+
 class DeclarationNode(ASTNode):
-    """Handles: let x = 10."""
     def __init__(self, name, value_node):
         self.name = name
         self.value_node = value_node
-    def __repr__(self):
-        return f"let {self.name} = {self.value_node}"
 
 class AssignmentNode(ASTNode):
-    """Handles: set x to 20."""
     def __init__(self, name, value_node):
         self.name = name
         self.value_node = value_node
-    def __repr__(self):
-        return f"set {self.name} to {self.value_node}"
 
 class PrintNode(ASTNode):
-    """Handles: print x."""
     def __init__(self, expression):
         self.expression = expression
-    def __repr__(self):
-        return f"print({self.expression})"
+
+class InputNode(ASTNode):
+    def __init__(self, name, prompt):
+        self.name = name
+        self.prompt = prompt
 
 class IfNode(ASTNode):
-    """Handles: when x >= 10 then ... stop."""
+    def __init__(self, condition, then_block, else_block):
+        self.condition = condition
+        self.then_block = then_block
+        self.else_block = else_block
+
+class LoopNode(ASTNode):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
-    def __repr__(self):
-        return f"when {self.condition} then {self.body} stop"

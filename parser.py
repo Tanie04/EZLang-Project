@@ -1,5 +1,3 @@
-#Build an AST tree from the tokens
-from lexer import Lexer
 from nodes import *
 
 class Parser:
@@ -10,102 +8,185 @@ class Parser:
         self.advance()
 
     def advance(self):
-        """Move to the next token in the list."""
         self.pos += 1
         self.current_token = self.tokens[self.pos] if self.pos < len(self.tokens) else None
 
     def parse(self):
-        """Main entry point: Program = { Statement }"""
         statements = []
         while self.current_token is not None:
-            # Skip empty lines or stray dots
             if self.current_token[0] in ('NEWLINE', 'DOT'):
                 self.advance()
                 continue
-            statements.append(self.statement())
+            
+            stmt = self.statement()
+            statements.append(stmt)
+
+            if self.current_token and self.current_token[0] == 'DOT':
+                self.advance()
         return statements
 
     def statement(self):
-        """Determine the statement type based on the leading keyword."""
         token_type = self.current_token[0]
-        
-        if token_type == 'LET':
-            return self.let_statement()
-        elif token_type == 'SET':
-            return self.set_statement()
-        elif token_type == 'PRINT':
-            return self.print_statement()
-        elif token_type == 'WHEN':
-            return self.when_statement()
-        
-        raise SyntaxError(f"Parser Error: Unexpected token {self.current_token} at position {self.pos}")
+        if token_type == 'LET': return self.variable_decl()
+        if token_type == 'SET': return self.assignment()
+        if token_type == 'PRINT': return self.print_stmt()
+        if token_type == 'INPUT': return self.input_stmt()
+        if token_type == 'WHEN': return self.if_stmt()
+        if token_type == 'KEEP_GOING': return self.loop_stmt()
+        raise SyntaxError(f"Invalid statement: {token_type}")
 
-    def let_statement(self):
-        """Parse: let <ID> = <EXPRESSION>."""
-        self.advance() # Skip 'let'
-        if self.current_token[0] != 'ID':
-            raise SyntaxError("Expected identifier after 'let'")
+    def variable_decl(self):
+        self.advance()
+        name = self.current_token[1]
+        self.advance()
+        self.advance()
+        val = self.expression()
+        return DeclarationNode(name, val)
+
+    def assignment(self):
+        self.advance()
+        name = self.current_token[1]
+        self.advance()
+        self.advance()
+        val = self.expression()
+        return AssignmentNode(name, val)
+
+    def print_stmt(self):
+        self.advance()
+        val = self.expression()
+        return PrintNode(val)
+
+    def input_stmt(self):
+        self.advance()
+        name = self.current_token[1]
+        self.advance()
+        self.advance()
+        prompt = self.current_token[1]
+        self.advance()
+        return InputNode(name, prompt)
+
+    def if_stmt(self):
+        self.advance()
+        cond = self.condition()
+        if self.current_token[0] != 'THEN':
+            raise SyntaxError("Expected 'then'")
+        self.advance()
+
+        then_b = []
+        else_b = []
         
-        var_name = self.current_token[1]
-        self.advance() # Skip ID
+        while self.current_token and self.current_token[0] not in ('ELSE', 'STOP'):
+            if self.current_token[0] in ('NEWLINE', 'DOT'):
+                self.advance()
+                continue
+            then_b.append(self.statement())
+            if self.current_token and self.current_token[0] == 'DOT':
+                self.advance()
+
+        if self.current_token and self.current_token[0] == 'ELSE':
+            self.advance() 
+            while self.current_token and self.current_token[0] != 'STOP':
+                if self.current_token[0] in ('NEWLINE', 'DOT'):
+                    self.advance()
+                    continue
+                else_b.append(self.statement())
+                if self.current_token and self.current_token[0] == 'DOT':
+                    self.advance()
         
-        if self.current_token[0] != 'ASSIGN':
-            raise SyntaxError("Expected '=' in variable declaration")
+        if self.current_token[0] != 'STOP':
+            raise SyntaxError("Expected 'stop'")
+        self.advance() 
+        return IfNode(cond, then_b, else_b)
+
+    def loop_stmt(self):
+        self.advance()
+
+        if self.current_token[0] != 'COLON':
+            raise SyntaxError(f"Expected ':' but found {self.current_token[0]}")
+        self.advance()
+
+        body = []
+        while self.current_token and self.current_token[0] != 'UNTIL':
+            if self.current_token[0] in ('NEWLINE', 'DOT'):
+                self.advance()
+                continue
             
-        self.advance() # Skip '='
-        value = self.expression()
-        return DeclarationNode(var_name, value)
-
-    def set_statement(self):
-        """Parse: set <ID> to <EXPRESSION>."""
-        self.advance() # Skip 'set'
-        var_name = self.current_token[1]
-        self.advance() # Skip ID
-        
-        if self.current_token[0] != 'TO':
-            raise SyntaxError("Expected 'to' in assignment statement")
+            stmt = self.statement()
+            body.append(stmt)
             
-        self.advance() # Skip 'to'
-        value = self.expression()
-        return AssignmentNode(var_name, value)
+            if self.current_token and self.current_token[0] == 'DOT':
+                self.advance()
+                
+        if not self.current_token or self.current_token[0] != 'UNTIL':
+            raise SyntaxError("Expected 'until' at the end of loop")
+        self.advance() 
+        
+        cond = self.condition()
+        return LoopNode(cond, body)
 
-    def print_statement(self):
-        """Parse: print <EXPRESSION>."""
-        self.advance() # Skip 'print'
-        value = self.expression()
-        return PrintNode(value)
+    def condition(self):
+        node = self.and_expr()
+        while self.current_token and self.current_token[0] == 'OR':
+            op = self.current_token[0]
+            self.advance()
+            node = BinOpNode(node, op, self.and_expr())
+        return node
+
+    def and_expr(self):
+        node = self.not_expr()
+        while self.current_token and self.current_token[0] == 'AND':
+            op = self.current_token[0]
+            self.advance()
+            node = BinOpNode(node, op, self.not_expr())
+        return node
+
+    def not_expr(self):
+        if self.current_token[0] == 'NOT':
+            self.advance()
+            return UnaryOpNode('NOT', self.comparison())
+        return self.comparison()
+
+    def comparison(self):
+        left = self.expression()
+        if self.current_token and self.current_token[0] in ('GT', 'LT', 'EQ', 'GE', 'LE'):
+            op = self.current_token[0]
+            self.advance()
+            return BinOpNode(left, op, self.expression())
+        return left
 
     def expression(self):
-        """Handle basic literals and identifiers."""
-        token_type, token_val = self.current_token
-        
-        if token_type == 'NUMBER':
+        node = self.mul_expr()
+        while self.current_token and self.current_token[0] in ('PLUS', 'MINUS'):
+            op = self.current_token[0]
             self.advance()
-            return NumberNode(token_val)
-        elif token_type == 'ID':
-            self.advance()
-            return VariableNode(token_val)
-        elif token_type == 'STRING':
-            self.advance()
-            return StringNode(token_val)
-            
-        raise SyntaxError(f"Expected expression but found {token_type}")
+            node = BinOpNode(node, op, self.mul_expr())
+        return node
 
-# --- EXECUTION FOR TESTING ---
-if __name__ == "__main__":
-    code = '''
-    let x = 10.
-    set x to 20.
-    print x.
-    '''
-    lexer = Lexer(code)
-    tokens = lexer.tokenize()
-    
-    parser = Parser(tokens)
-    try:
-        ast = parser.parse()
-        print("--- AST STRUCTURE ---")
-        for node in ast:
-            print(node)
-    except Exception as e:
-        print(f"Compilation Error: {e}")
+    def mul_expr(self):
+        node = self.unary_expr()
+        while self.current_token and self.current_token[0] in ('MUL', 'DIV', 'MOD'):
+            op = self.current_token[0]
+            self.advance()
+            node = BinOpNode(node, op, self.unary_expr())
+        return node
+
+    def unary_expr(self):
+        if self.current_token[0] == 'MINUS':
+            self.advance()
+            return UnaryOpNode('MINUS', self.primary())
+        return self.primary()
+
+    def primary(self):
+        token = self.current_token
+        if token[0] == 'NUMBER':
+            self.advance(); return NumberNode(token[1])
+        if token[0] == 'STRING':
+            self.advance(); return StringNode(token[1])
+        if token[0] == 'ID':
+            self.advance(); return VariableNode(token[1])
+        if token[0] == 'LPAREN':
+            self.advance()
+            node = self.expression()
+            self.advance()
+            return node
+        raise SyntaxError(f"Unexpected token: {token[0]}")

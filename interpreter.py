@@ -1,72 +1,76 @@
 from nodes import *
-from environment import Environment
-from lexer import Lexer
-from parser import Parser
 
 class Interpreter:
     def __init__(self, env):
         self.env = env
 
     def visit(self, node):
-        method_name = f'visit_{type(node).__name__}'
-        visitor = getattr(self, method_name, self.no_visit_method)
+        method = f'visit_{type(node).__name__}'
+        visitor = getattr(self, method)
         return visitor(node)
 
-    def no_visit_method(self, node):
-        raise Exception(f"No visit_{type(node).__name__} method defined")
+    def visit_NumberNode(self, node): return node.value
+    def visit_StringNode(self, node): return node.value
+    def visit_VariableNode(self, node): return self.env.lookup(node.name)
 
-    def visit_NumberNode(self, node):
-        return node.value
+    def visit_BinOpNode(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        
+        # Xử lý phép cộng (Số + Số HOẶC Chuỗi + Chuỗi)
+        if node.op == 'PLUS':
+            if isinstance(left, str) or isinstance(right, str):
+                return str(left) + str(right)
+            return left + right
+            
+        if node.op == 'MINUS': return left - right
+        if node.op == 'MUL': return left * right
+        if node.op == 'DIV': return left / right
+        if node.op == 'MOD': return left % right
+        if node.op == 'GT': return left > right
+        if node.op == 'LT': return left < right
+        if node.op == 'GE': return left >= right
+        if node.op == 'LE': return left <= right
+        if node.op == 'EQ': return left == right
+        if node.op == 'AND': return left and right
+        if node.op == 'OR': return left or right
 
-    def visit_VariableNode(self, node):
-        return self.env.lookup(node.name)
+    def visit_UnaryOpNode(self, node):
+        val = self.visit(node.operand)
+        if node.op == 'MINUS': return -val
+        if node.op == 'NOT': return not val
 
     def visit_DeclarationNode(self, node):
-        value = self.visit(node.value_node)
-        self.env.declare(node.name, value)
-        return value
+        val = self.visit(node.value_node)
+        self.env.declare(node.name, val)
 
     def visit_AssignmentNode(self, node):
-        value = self.visit(node.value_node)
-        self.env.assign(node.name, value)
-        return value
+        val = self.visit(node.value_node)
+        self.env.assign(node.name, val)
 
     def visit_PrintNode(self, node):
-        value = self.visit(node.expression)
-        print(f"[EZLang Output]: {value}")
-        return value
-    
-    def visit_StringNode(self, node):
-        return node.value
+        print(self.visit(node.expression))
 
-if __name__ == "__main__":
-    source_code = '''
-    let a = 10.
-    let b = 20.
-    set a to 50.
-    print a.
-    print b.
-    print "Project completed by Yen Nhi".
-    '''
-    
-    try:
-        env = Environment()
-        lexer = Lexer(source_code)
-        tokens = lexer.tokenize()
-        
-        parser = Parser(tokens)
-        ast = parser.parse()
-        
-        interpreter = Interpreter(env)
-        
-        print("--- Start Executing ---")
-        for statement in ast:
-            interpreter.visit(statement)
-        print("--- Execution Finished ---")
-        
-    except NameError as e:
-        print(f"Semantic Error: {e}")
-    except SyntaxError as e:
-        print(f"Syntax Error: {e}")
-    except Exception as e:
-        print(f"Unexpected Error: {e}")
+    def visit_InputNode(self, node):
+        # Sửa lỗi: Dùng input() để nhận dữ liệu thực tế
+        val = input(node.prompt + " ")
+        # Cố gắng chuyển sang số nếu có thể, không thì giữ là chuỗi
+        try:
+            if '.' in val: val = float(val)
+            else: val = int(val)
+        except ValueError:
+            pass
+        self.env.declare(node.name, val)
+
+    def visit_IfNode(self, node):
+        if self.visit(node.condition):
+            for stmt in node.then_block: self.visit(stmt)
+        else:
+            for stmt in node.else_block: self.visit(stmt)
+
+    def visit_LoopNode(self, node):
+        # Thực hiện Body trước khi check điều kiện (theo EBNF của Nam)
+        while True:
+            for stmt in node.body: self.visit(stmt)
+            if self.visit(node.condition):
+                break
