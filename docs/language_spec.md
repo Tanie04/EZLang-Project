@@ -1,51 +1,86 @@
 ## Variables
-```
+```ezlang
 let name = "Nam".
 set x to 5.
 ```
-  - let is used to declare a variable
-  - set is used to assign a value
+- `let` is used to declare a variable
+- `set` is used to assign a value
+
+---
 
 ## Output
-```
+```ezlang
 print "Hello".
 print "Hello " + name.
 ```
-  - print is used to display output
-  - Strings can be concatenated using +
+- `print` is used to display output
+- `+` is used for both numeric addition and string concatenation
+
+---
 
 ## Input
-```
+```ezlang
 input name with "What is your name?".
 ```
-  - Takes input from the user and stores it in a variable
+- Takes input from the user and stores it in a variable
+
+---
 
 ## If / Else
-```
+```ezlang
 when x > 5 then
     print "Big".
 else
     print "Small".
 stop.
 ```
-  - when starts the condition
-  - then begins the block
-  - else is optional
-  - stop. ends the block
+- `when` starts the condition
+- `then` begins the block
+- `else` is optional
+- `stop.` ends the block
+
+---
 
 ## Loop
-```
+```ezlang
 keep going:
     print x.
 until x == 5.
 ```
-  - Repeats the block until the condition is true
+- Repeats the block until the condition is true
+
+---
 
 ## Modulo
+```ezlang
+x mod y.
 ```
-x mod y. 
+- Returns the remainder of a division
+
+---
+
+## Lists
+```ezlang
+set numbers to [1, 2, 3].
 ```
-  - Returns the remainder of a division
+- Lists use square brackets `[]`
+- Elements are separated by commas
+
+---
+
+## Functions
+```ezlang
+define task greet
+    print "Hello".
+end task.
+
+greet.
+```
+- `define task` is used to create a function
+- `end task.` ends the function
+- Functions are called using the function name followed by `.`
+
+---
 
 ## Notes
 - Every statement ends with a period `.`
