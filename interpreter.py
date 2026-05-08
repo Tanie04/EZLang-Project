@@ -13,10 +13,12 @@ class Interpreter:
     def visit_StringNode(self, node): return node.value
     def visit_VariableNode(self, node): return self.env.lookup(node.name)
 
+    def visit_ListNode(self, node):
+        return [self.visit(x) for x in node.elements]
+
     def visit_BinOpNode(self, node):
         left = self.visit(node.left)
-        right = self.visit(node.right)
-        
+        right = self.visit(node.right) 
         # Xử lý phép cộng (Số + Số HOẶC Chuỗi + Chuỗi)
         if node.op == 'PLUS':
             if isinstance(left, str) or isinstance(right, str):
@@ -54,6 +56,7 @@ class Interpreter:
     def visit_InputNode(self, node):
         # Sửa lỗi: Dùng input() để nhận dữ liệu thực tế
         val = input(node.prompt + " ")
+
         # Cố gắng chuyển sang số nếu có thể, không thì giữ là chuỗi
         try:
             if '.' in val: val = float(val)
@@ -64,13 +67,26 @@ class Interpreter:
 
     def visit_IfNode(self, node):
         if self.visit(node.condition):
-            for stmt in node.then_block: self.visit(stmt)
+            for stmt in node.then_block:
+                self.visit(stmt)
         else:
-            for stmt in node.else_block: self.visit(stmt)
+            for stmt in node.else_block:
+                self.visit(stmt)
 
     def visit_LoopNode(self, node):
         # Thực hiện Body trước khi check điều kiện (theo EBNF của Nam)
         while True:
-            for stmt in node.body: self.visit(stmt)
+            for stmt in node.body:
+                self.visit(stmt)
             if self.visit(node.condition):
                 break
+
+    def visit_FunctionDefNode(self, node):
+        self.env.functions[node.name] = node
+
+    def visit_FunctionCallNode(self, node):
+        if node.name not in self.env.functions:
+            raise Exception(f"Undefined function '{node.name}'")
+        func = self.env.functions[node.name]
+        for stmt in func.body:
+            self.visit(stmt)
