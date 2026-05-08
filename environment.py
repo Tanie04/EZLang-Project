@@ -1,6 +1,7 @@
 class Environment:
     def __init__(self):
         self.variables = {}
+        self.functions = {}
 
     def declare(self, name, value):
         if name in self.variables:
