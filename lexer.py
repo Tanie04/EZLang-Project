@@ -37,6 +37,11 @@ TOKEN_SPEC = [
     ('SKIP',       r'[ \t]+'),
     ('NEWLINE',    r'\n'),
     ('MISMATCH',   r'.'),
+    ('LBRACKET',  r'\['),
+    ('RBRACKET',  r'\]'),
+    ('COMMA',     r','),
+    ('DEFINE_TASK', r'\bdefine\s+task\b'),
+    ('END_TASK', r'\bend\s+task\b'),
 ]
 
 class Lexer:
