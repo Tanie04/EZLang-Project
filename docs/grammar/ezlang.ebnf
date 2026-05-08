@@ -5,7 +5,9 @@ statement = variable_decl
           | print_stmt
           | input_stmt
           | if_stmt
-          | loop_stmt ;
+          | loop_stmt
+          | function_def
+          | function_call ;
 
 variable_decl = "let" identifier "=" expression "." ;
 
@@ -25,6 +27,12 @@ loop_stmt = "keep" "going" ":"
               block
             "until" condition "." ;
 
+function_def = "define" "task" identifier
+                 block
+               "end" "task" "." ;
+
+function_call = identifier "." ;
+
 block = { statement } ;
 
 condition = or_expr ;
@@ -41,16 +49,22 @@ comparator = ">" | "<" | "==" | ">=" | "<=" ;
 
 expression = add_expr ;
 
+(* '+' supports both numeric addition and string concatenation *)
 add_expr = mul_expr { ("+" | "-") mul_expr } ;
 
+(* 'mod' is used for modulo operations *)
 mul_expr = unary_expr { ("*" | "/" | "mod") unary_expr } ;
 
+(* negative numbers are supported *)
 unary_expr = [ "-" ] primary ;
 
 primary = number
         | string
         | identifier
+        | list
         | "(" expression ")" ;
+
+list = "[" [ expression { "," expression } ] "]" ;
 
 identifier = letter { letter | digit | "_" } ;
 
