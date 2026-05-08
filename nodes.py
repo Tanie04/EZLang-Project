@@ -63,3 +63,25 @@ class LoopNode(ASTNode):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
+
+class ListNode(ASTNode):
+    def __init__(self, elements):
+        self.elements = elements
+
+    def __repr__(self):
+        return f"{self.elements}"
+
+class FunctionDefNode(ASTNode):
+    def __init__(self, name, body):
+        self.name = name
+        self.body = body
+
+    def __repr__(self):
+        return f"<function {self.name}>"
+
+class FunctionCallNode(ASTNode):
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f"<call {self.name}>"
