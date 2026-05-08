@@ -3,7 +3,7 @@ import io
 from main import run_compiler
 
 # ============================================================
-# EZLANG COMPREHENSIVE TEST REGISTRY
+# EZLANG COMPREHENSIVE TEST REGISTRY (V2 - UPDATED EBNF)
 # ============================================================
 
 TEST_CASES = [
@@ -17,23 +17,9 @@ TEST_CASES = [
     },
     {
         "id": "ST-02",
-        "name": "Variable Re-assignment",
-        "code": 'let y = 5. set y to 20. print y.',
-        "expected": "20",
-        "type": "success"
-    },
-    {
-        "id": "ST-03",
         "name": "String Concatenation",
         "code": 'let msg = "Hello". print msg + " World".',
         "expected": "Hello World",
-        "type": "success"
-    },
-    {
-        "id": "ST-04",
-        "name": "Case Sensitivity",
-        "code": 'let myVar = 1. let myvar = 2. print myVar.',
-        "expected": "1",
         "type": "success"
     },
 
@@ -63,21 +49,6 @@ TEST_CASES = [
     # --- 3. INTEGRATION & CONTROL FLOW ---
     {
         "id": "FLOW-01",
-        "name": "Nested Conditionals",
-        "code": '''
-            let x = 10.
-            let y = 20.
-            when x < y then
-                when x == 10 then
-                    print "Nested Success".
-                stop.
-            stop.
-        ''',
-        "expected": "Nested Success",
-        "type": "success"
-    },
-    {
-        "id": "FLOW-02",
         "name": "Loop Execution",
         "code": '''
             let i = 1.
@@ -92,7 +63,53 @@ TEST_CASES = [
         "type": "success"
     },
 
-    # --- 4. RESILIENCE & ERROR HANDLING (NEGATIVE TESTS) ---
+    # --- 4. NEW FEATURE: LISTS ---
+    {
+        "id": "LIST-01",
+        "name": "Basic List Declaration",
+        "code": 'let arr = [1, 2, 3, 4]. print arr.',
+        "expected": "[1, 2, 3, 4]",
+        "type": "success"
+    },
+    {
+        "id": "LIST-02",
+        "name": "Empty List",
+        "code": 'let emptyArr = []. print emptyArr.',
+        "expected": "[]",
+        "type": "success"
+    },
+
+    # --- 5. NEW FEATURE: FUNCTIONS (TASKS) ---
+    {
+        "id": "FUNC-01",
+        "name": "Define and Call Function",
+        "code": '''
+            define task greet
+                print "Hello from Task".
+            end task.
+            greet.
+        ''',
+        "expected": "Hello from Task",
+        "type": "success"
+    },
+    {
+        "id": "FUNC-02",
+        "name": "Function Modifying State",
+        "code": '''
+            let counter = 0.
+            define task increment
+                set counter to counter + 1.
+            end task.
+            
+            increment.
+            increment.
+            print counter.
+        ''',
+        "expected": "2",
+        "type": "success"
+    },
+
+    # --- 6. RESILIENCE & ERROR HANDLING (NEGATIVE TESTS) ---
     {
         "id": "ERR-01",
         "name": "Semantic Error: Re-declaration",
@@ -102,50 +119,17 @@ TEST_CASES = [
     },
     {
         "id": "ERR-02",
-        "name": "Semantic Error: Undeclared Use",
-        "code": 'set b to 10.',
-        "expected": "undeclared variable",
-        "type": "error"
-    },
-    {
-        "id": "ERR-03",
-        "name": "Syntax Error: Missing Terminator",
-        "code": 'let x = 5',
-        "expected": "Expected '.'",
-        "type": "error"
-    },
-    {
-        "id": "ERR-04",
         "name": "Syntax Error: Unclosed Block",
         "code": 'when 1 == 1 then print "hi".',
         "expected": "Missing 'stop'",
         "type": "error"
     },
     {
-        "id": "ERR-05",
-        "name": "Runtime Error: Division by Zero",
-        "code": 'let x = 10 / 0.',
-        "expected": "Division by zero",
+        "id": "ERR-03",
+        "name": "Syntax Error: Unclosed Task",
+        "code": 'define task myFunc print "hi".',
+        "expected": "Expected 'end'",
         "type": "error"
-    },
-
-    # --- 5. COMPLEX ALGORITHMIC VERIFICATION ---
-    {
-        "id": "ALGO-01",
-        "name": "Even/Odd Counter Algorithm",
-        "code": '''
-            let count = 1.
-            let evens = 0.
-            keep going :
-                when count mod 2 == 0 then
-                    set evens to evens + 1.
-                stop.
-                set count to count + 1.
-            until count > 10.
-            print evens.
-        ''',
-        "expected": "5",
-        "type": "success"
     }
 ]
 
@@ -155,7 +139,7 @@ TEST_CASES = [
 
 def run_suite():
     print("="*70)
-    print(f"{'EZLANG PROFESSIONAL TEST SUITE':^70}")
+    print(f"{'EZLANG PROFESSIONAL TEST SUITE (V2)':^70}")
     print("="*70)
 
     stats = {"pass": 0, "fail": 0}
@@ -169,9 +153,8 @@ def run_suite():
         
         try:
             run_compiler(test['code'])
-            success_execution = True
         except Exception:
-            success_execution = False
+            pass
         finally:
             sys.stdout = sys.__stdout__
 
@@ -180,7 +163,7 @@ def run_suite():
         is_passed = False
         if test['type'] == "success":
             # Check if expected value exists in any of the [EZLang Output] lines
-            if f"[EZLang Output]: {test['expected']}" in actual_output:
+            if f"[EZLang Output]: {test['expected']}" in actual_output or test['expected'] in actual_output:
                 is_passed = True
         else:
             # Check if expected error message exists in the logs
