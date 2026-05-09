@@ -5,7 +5,9 @@ statement = variable_decl
           | print_stmt
           | input_stmt
           | if_stmt
-          | loop_stmt ;
+          | loop_stmt
+          | function_def       (* ĐÃ BỔ SUNG *)
+          | function_call ;    (* ĐÃ BỔ SUNG *)
 
 variable_decl = "let" identifier "=" expression "." ;
 
@@ -24,6 +26,13 @@ if_stmt = "when" condition "then"
 loop_stmt = "keep" "going" ":"
               block
             "until" condition "." ;
+
+(* --- CÁC LUẬT MỚI CHO HÀM (TASK) --- *)
+function_def = "define" "task" identifier
+                 block
+               "end" "task" "." ;
+
+function_call = identifier "." ;
 
 block = { statement } ;
 
@@ -50,7 +59,11 @@ unary_expr = [ "-" ] primary ;
 primary = number
         | string
         | identifier
+        | list                 (* ĐÃ BỔ SUNG *)
         | "(" expression ")" ;
+
+(* --- LUẬT MỚI CHO DANH SÁCH (LIST) --- *)
+list = "[" [ expression { "," expression } ] "]" ;
 
 identifier = letter { letter | digit | "_" } ;
 
@@ -65,11 +78,3 @@ letter = "a" | "b" | "c" | "d" | "e" | "f" | "g"
        | "A" | "B" | "C" | "D" | "E" | "F" | "G"
        | "H" | "I" | "J" | "K" | "L" | "M" | "N"
        | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
-       | "V" | "W" | "X" | "Y" | "Z" ;
-
-digit = "0" | "1" | "2" | "3" | "4"
-      | "5" | "6" | "7" | "8" | "9" ;
-
-character = ? any character except " ? ;
-
-EOF = ? end of input ? ;

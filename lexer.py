@@ -20,6 +20,8 @@ TOKEN_SPEC = [
     ('NOT',        r'\bnot\b'),
     ('NUMBER',     r'\d+(\.\d+)?'),
     ('STRING',     r'"[^"]*"'),
+    ('INPUT',      r'\binput\b'),
+    ('WITH',       r'\bwith\b'),
     ('ID',         r'[a-zA-Z_]\w*'),
     ('EQ',         r'=='),
     ('GE',         r'>='),

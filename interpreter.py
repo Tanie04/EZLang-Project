@@ -79,3 +79,19 @@ class Interpreter:
         # Execute the function body
         for s in func['body']:
             self.visit(s)
+    def visit_InputNode(self, node):
+        # Hiển thị prompt và nhận dữ liệu từ terminal
+        user_input = input(node.prompt)
+        
+        # Cố gắng chuyển sang số nếu có thể, không thì giữ nguyên chuỗi
+        try:
+            if '.' in user_input:
+                user_input = float(user_input)
+            else:
+                user_input = int(user_input)
+        except ValueError:
+            pass # Giữ nguyên dạng chuỗi
+            
+        # Lưu vào môi trường (tự động khai báo nếu chưa có)
+        self.env.variables[node.name] = user_input
+        return user_input

@@ -26,7 +26,10 @@ class Parser:
         return statements
 
     def statement(self):
+
         t = self.current_token[0]
+        if t == 'INPUT': return self.input_stmt()
+        
         if t == 'LET': return self.let_stmt()
         if t == 'SET': return self.set_stmt()
         if t == 'PRINT': return self.print_stmt()
@@ -179,3 +182,16 @@ class Parser:
             self.expect('RBRACKET', "Expected ']'")
             return ListNode(elements)
         raise SyntaxError(f"Unexpected token {t_type}")
+    
+    def input_stmt(self):
+        self.advance() # Bỏ qua chữ 'input'
+        name = self.current_token[1]
+        self.advance() # Bỏ qua tên biến (ID)
+        
+        self.expect('WITH', "Expected 'with' in input statement")
+        
+        prompt = self.current_token[1]
+        self.expect('STRING', "Expected string prompt after 'with'")
+        self.expect('DOT', "Expected '.' at end of input statement")
+        
+        return InputNode(name, prompt)

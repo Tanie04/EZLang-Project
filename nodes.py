@@ -54,3 +54,8 @@ class FunctionDefNode(ASTNode):
 class FunctionCallNode(ASTNode):
     def __init__(self, name):
         self.name = name
+
+class InputNode(ASTNode):
+    def __init__(self, name, prompt):
+        self.name = name
+        self.prompt = prompt
