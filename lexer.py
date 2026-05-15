@@ -62,6 +62,6 @@ class Lexer:
             elif kind in ('SKIP', 'NEWLINE'):
                 continue
             elif kind == 'MISMATCH':
-                raise RuntimeError(f"Unexpected character {value}")
+                raise SyntaxError(f"Unexpected character {value}")
             tokens.append((kind, value))
         return tokens
